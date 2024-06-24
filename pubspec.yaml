@@ -8,8 +8,6 @@ environment:
   sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
-  # alarm:
-  #   path: ../
   alarm: ^3.1.4
   cupertino_icons: ^1.0.2
   flutter:
@@ -18,7 +16,6 @@ dependencies:
   permission_handler: ^11.1.0
   provider: ^6.1.2
   shared_preferences: ^2.2.3
-  wifi_iot: ^0.3.19
   
 
 dev_dependencies:

@@ -7,7 +7,6 @@ class SessionsScreen extends StatefulWidget {
   @override
   _SessionsScreenState createState() => _SessionsScreenState();
 }
-
 class _SessionsScreenState extends State<SessionsScreen> {
   DateTime? _selectedSession;
 
@@ -19,36 +18,29 @@ class _SessionsScreenState extends State<SessionsScreen> {
       ),
       body: Consumer<AppState>(
         builder: (context, appState, child) {
+          final sessions = List.from(appState.sessions)..sort((a, b) => a.compareTo(b));
           return Column(
             children: [
               Expanded(
                 child: ListView.builder(
-                  itemCount: appState.sessions.length,
+                  itemCount: sessions.length,
                   itemBuilder: (context, index) {
-                    final session = appState.sessions[index];
+                    final session = sessions[index];
                     return ListTile(
                       title: Text(DateFormat('hh:mm a').format(session)),
                       subtitle: Text(DateFormat('EEE, MMM d').format(session)),
-                      // title: Text(session.toString()),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
                             icon: Icon(Icons.edit),
-                            onPressed: () {
-                              _selectedSession = session;
-                              _showTimePicker(context, _selectedSession!)
-                                  .then((newTime) {
-                                if (newTime != null) {
-                                  Provider.of<AppState>(context, listen: false)
-                                      .updateSession(
-                                          _selectedSession!, newTime);
-                                  _selectedSession = null;
-                                  // Navigator.of(context).pop();
-                                }
-                              });
-                              // _showEditDialog();
-                            },
+                            onPressed: () => _showTimePicker(context, session)
+                                .then((newTime) {
+                              if (newTime != null) {
+                                appState.updateSession(session, newTime);
+                                setState(() {}); // Update the screen
+                              }
+                            }),
                           ),
                           IconButton(
                             icon: Icon(
@@ -57,6 +49,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                             ),
                             onPressed: () {
                               appState.removeSession(session);
+                              setState(() {}); // Update the screen
                             },
                           ),
                         ],
@@ -71,19 +64,14 @@ class _SessionsScreenState extends State<SessionsScreen> {
                   children: [
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () {
-                          // _showAddDialog();
-                          _showTimePicker(context,
-                                  DateTime.now().add(Duration(minutes: 1)))
-                              .then((newTime) {
-                            if (newTime != null) {
-                              Provider.of<AppState>(context, listen: false)
-                                  .addSession(newTime);
-                              _selectedSession = null;
-                              // Navigator.of(context).pop();
-                            }
-                          });
-                        },
+                        onPressed: () => _showTimePicker(context,
+                                DateTime.now().add(Duration(minutes: 1)))
+                            .then((newTime) {
+                          if (newTime != null) {
+                            appState.addSession(newTime);
+                            setState(() {}); // Update the screen
+                          }
+                        }),
                         child: Text('Add Session'),
                       ),
                     ),
@@ -104,14 +92,13 @@ class _SessionsScreenState extends State<SessionsScreen> {
       initialTime: TimeOfDay.fromDateTime(initialTime),
     );
     if (pickedTime != null) {
-      final newTime = DateTime(
+      return DateTime(
         initialTime.year,
         initialTime.month,
         initialTime.day,
         pickedTime.hour,
         pickedTime.minute,
       );
-      return newTime;
     }
     return null;
   }

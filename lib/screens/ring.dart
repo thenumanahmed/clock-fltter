@@ -1,7 +1,6 @@
 import 'package:alarm/alarm.dart';
 import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
-import 'package:wifi_iot/wifi_iot.dart';
 
 class ExampleAlarmRingScreen extends StatelessWidget {
   const ExampleAlarmRingScreen({required this.alarmSettings, super.key});
@@ -28,6 +27,7 @@ class ExampleAlarmRingScreen extends StatelessWidget {
                     final now = DateTime.now();
                     Alarm.set(
                       alarmSettings: alarmSettings.copyWith(
+                        notificationTitle: "NO",
                         dateTime: DateTime(
                           now.year,
                           now.month,
@@ -45,7 +45,6 @@ class ExampleAlarmRingScreen extends StatelessWidget {
                 ),
                 RawMaterialButton(
                   onPressed: () async {
-                    await WiFiForIoTPlugin.setEnabled(false);
                     await Alarm.stop(alarmSettings.id);
                     print('stopping');
                     Navigator.pop(context);

@@ -10,14 +10,10 @@
    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
    <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
-   <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
-   <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-   <uses-permission android:name="android.permission.INTERNET"/>
-   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
    <application
+        android:name=".Application"
         android:label="alarm_example"
-        android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <service android:name="com.gdelataillade.alarm.services.NotificationOnKillService" />
         <activity

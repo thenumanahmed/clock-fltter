@@ -1,7 +1,6 @@
 import 'package:alarm/alarm.dart';
 import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
-import 'package:wifi_iot/wifi_iot.dart';
 
 class NotifyScreen extends StatelessWidget {
   const NotifyScreen({required this.alarmSettings, super.key});
@@ -45,7 +44,7 @@ class NotifyScreen extends StatelessWidget {
                 ),
                 RawMaterialButton(
                   onPressed: () async {
-                    await WiFiForIoTPlugin.setEnabled(false);
+                    // await WiFiForIoTPlugin.setEnabled(false);
                     await Alarm.stop(alarmSettings.id);
                     print('stopping');
                     Navigator.pop(context);

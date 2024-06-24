@@ -1,14 +1,16 @@
 import 'dart:async';
 
-import 'package:alarm_example/provider/notify_screen.dart';
+import 'package:alarm_example/provider/alarms_screen.dart';
+import 'package:alarm_example/provider/days_row.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:alarm/alarm.dart';
 import 'package:alarm/model/alarm_settings.dart';
 
-
 import './app_provider.dart';
+import 'edit_dialog.dart';
+import 'notify_screen.dart';
 import 'session_screen.dart';
 
 class MainUI extends StatefulWidget {
@@ -17,11 +19,10 @@ class MainUI extends StatefulWidget {
 }
 
 class _MainUIState extends State<MainUI> {
-  
-
   @override
   void initState() {
     super.initState();
+     Provider.of<AppState>(context, listen: false).loadSessionsFromStorage( );
     if (Alarm.android) {
       checkAndroidNotificationPermission();
       checkAndroidScheduleExactAlarmPermission();
@@ -31,16 +32,16 @@ class _MainUIState extends State<MainUI> {
     Alarm.ringStream.stream.listen(navigateToNotifyScreen);
   }
 
-   Future<void> navigateToNotifyScreen(AlarmSettings alarmSettings) async {
+  Future<void> navigateToNotifyScreen(AlarmSettings alarmSettings) async {
     await Navigator.push(
       context,
       MaterialPageRoute<void>(
-        builder: (context) =>
-            NotifyScreen(alarmSettings: alarmSettings),
+        builder: (context) => NotifyScreen(alarmSettings: alarmSettings),
       ),
     );
     // loadAlarms();
   }
+
   Future<void> checkAndroidNotificationPermission() async {
     final status = await Permission.notification.status;
     if (status.isDenied) {
@@ -75,42 +76,167 @@ class _MainUIState extends State<MainUI> {
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Main UI'),
+        title: Text('Out Reach Helper'),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SessionsScreen(),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text("No of Accounts: " +
+                        Provider.of<AppState>(context, listen: false)
+                            .noOfAccounts
+                            .toString()),
                   ),
-                );
-              },
-              child: Text('Show Sessions'),
-            ),
-            SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: () {
-                Provider.of<AppState>(context,listen: false).clearAlarms();                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => AccountsScreen(),
-                //   ),
-                // );
-              },
-              child: Text('Show Accounts'),
-            ),
-          ],
+                  IconButton(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return EditDialog(
+                              title: 'Edit No of Accounts',
+                              initialValue:
+                                  Provider.of<AppState>(context, listen: false)
+                                      .noOfAccounts
+                                      .toString(),
+                              onUpdate: (newValue) {
+                                Provider.of<AppState>(context, listen: false)
+                                    .updateNoOfAccounts(int.parse(newValue));
+                              },
+                            );
+                          },
+                        );
+                      },
+                      icon: Icon(Icons.edit))
+                ],
+              ),
+               Row(
+                children: [
+                  Expanded(
+                    child: Text("Warm Up Time in minutes: " +
+                        Provider.of<AppState>(context, listen: false)
+                            .warmupTime
+                            .toString()),
+                  ),
+                  IconButton(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return EditDialog(
+                              title: 'Edit Warm Up Time',
+                              initialValue:
+                                  Provider.of<AppState>(context, listen: false)
+                                      .warmupTime
+                                      .toString(),
+                              onUpdate: (newValue) {
+                                Provider.of<AppState>(context, listen: false)
+                                    .updateWarmupTime(int.parse(newValue));
+                              },
+                            );
+                          },
+                        );
+                      },
+                      icon: Icon(Icons.edit))
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text("DM Per Day: " +
+                        Provider.of<AppState>(context, listen: false)
+                            .dmReqPerDay
+                            .toString()),
+                  ),
+                  IconButton(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return EditDialog(
+                              title: 'DM Per Day',
+                              initialValue:
+                                  Provider.of<AppState>(context, listen: false)
+                                      .dmReqPerDay
+                                      .toString(),
+                              onUpdate: (newValue) {
+                                Provider.of<AppState>(context, listen: false)
+                                    .updateDmReqPerDay(int.parse(newValue));
+                              },
+                            );
+                          },
+                        );
+                      },
+                      icon: Icon(Icons.edit))
+                ],
+              ),
+              DaysRow(),  
+              Row(
+                children: [
+                  Expanded(
+                    child: Text("Follow Requests Per Day: " +
+                        Provider.of<AppState>(context, listen: true)
+                            .followReqPerDay
+                            .toString()),
+                  ),
+                  IconButton(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return EditDialog(
+                              title: 'Edit Follow Req Per Day',
+                              initialValue:
+                                  Provider.of<AppState>(context, listen: false)
+                                      .followReqPerDay
+                                      .toString(),
+                              onUpdate: (newValue) {
+                                Provider.of<AppState>(context, listen: false)
+                                    .updateFollowReqPerDay(int.parse(newValue));
+                                
+                              },
+                            );
+                          },
+                        );
+                      },
+                      icon: Icon(Icons.edit))
+                ],
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SessionsScreen(),
+                    ),
+                  );
+                },
+                child: Text('Show Sessions'),
+              ),
+              SizedBox(height: 16.0),
+              ElevatedButton(
+                onPressed: () {
+                  // Provider.of<AppState>(context, listen: false)
+                  //     .countPrint(); 
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AlarmsScreen(),
+                    )
+                  );
+                },
+                child: Text('Show Accounts'),
+              ),
+            ],
+          ),
         ),
       ),
     );
